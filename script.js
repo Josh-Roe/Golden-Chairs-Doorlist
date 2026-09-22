@@ -5,8 +5,11 @@
 
   const els = {
     appBar: document.getElementById('appBar'),
-    hideBtn: document.getElementById('hideBtn'),
     settingsBtn: document.getElementById('settingsBtn'),
+    patternBtn: document.getElementById('patternBtn'),
+    patternDialog: document.getElementById('patternDialog'),
+    cornerPattern: document.getElementById('cornerPattern'),
+    basePattern: document.getElementById('basePattern'),
     closeBtn: document.getElementById('closeBtn'),
 
     eventPhoto: document.getElementById('eventPhoto'),
@@ -40,6 +43,8 @@
     personName: 'Josh is da real goat',
     eventPhoto: DEFAULT_EVENT_PHOTO,
     profilePhoto: DEFAULT_AVATAR,
+    cornerPattern: 'square',
+    basePattern: 'small',
   };
 
   function loadState() {
@@ -81,7 +86,16 @@
     svg.setAttribute('viewBox', '0 0 702 704');
     svg.setAttribute('width', '100%');
     svg.setAttribute('height', '100%');
-    svg.innerHTML = `<defs><clipPath id="fixed-finders"><rect x="28" y="26" width="130" height="127"/><rect x="552" y="26" width="123" height="127"/><rect x="28" y="551" width="130" height="128"/></clipPath></defs><rect width="702" height="704" fill="#fff"/><image href="qr.svg" width="702" height="704" clip-path="url(#fixed-finders)"/>`;
+    svg.innerHTML = `<rect width="702" height="704" fill="#fff"/>`;
+    if (state.cornerPattern === 'square') {
+      svg.innerHTML += `<defs><clipPath id="fixed-finders"><rect x="28" y="26" width="130" height="127"/><rect x="552" y="26" width="123" height="127"/><rect x="28" y="551" width="130" height="128"/></clipPath></defs><image href="qr.svg" width="702" height="704" clip-path="url(#fixed-finders)"/>`;
+    } else {
+      const finders = document.createElementNS(ns, 'g');
+      [[88,86],[618,86],[88,619]].forEach(([cx, cy]) => {
+        [['#000',68],['#fff',48],['#000',26]].forEach(([fill,r]) => { const c=document.createElementNS(ns,'circle'); c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',r); c.setAttribute('fill',fill); finders.appendChild(c); });
+      });
+      svg.appendChild(finders);
+    }
     const connections = document.createElementNS(ns, 'g');
     connections.setAttribute('stroke', '#000');
     connections.setAttribute('stroke-width', '2.5');
@@ -89,19 +103,26 @@
     svg.appendChild(connections);
     const cells = [];
     const grid = new Map();
-    for (let y = 0; y < 37; y++) {
-      for (let x = 0; x < 37; x++) {
+    const gridSize = state.basePattern === 'large' ? 29 : 37;
+    const spacing = state.basePattern === 'large' ? 22.3 : 17.4;
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
         // Preserve the finder squares and their quiet margins.
-        if ((x < 8 && y < 8) || (x > 28 && y < 8) || (x < 8 && y > 28)) continue;
+        const cornerPad = state.basePattern === 'large' ? 7 : 8;
+        const rightStart = gridSize - cornerPad;
+        const bottomStart = gridSize - cornerPad;
+        if ((x < cornerPad && y < cornerPad) || (x >= rightStart && y < cornerPad) || (x < cornerPad && y >= bottomStart)) continue;
         const circle = document.createElementNS(ns, 'circle');
-        circle.setAttribute('cx', (38 + x * 17.4).toFixed(1));
-        circle.setAttribute('cy', (37 + y * 17.5).toFixed(1));
-        circle.setAttribute('r', '7.8');
+        circle.setAttribute('cx', (38 + x * spacing).toFixed(1));
+        circle.setAttribute('cy', (37 + y * spacing).toFixed(1));
+        circle.setAttribute('r', state.basePattern === 'large' ? '11.2' : '7.8');
         circle.setAttribute('fill', '#000');
         const covered = Math.hypot(38 + x * 17.4 - 356, 37 + y * 17.5 - 352) < 83;
-        const active = covered ? (x * 13 + y * 7 + x * y) % 11 < 6 : rows[y][x] === '1';
-        circle.style.visibility = active ? 'visible' : 'hidden';
+        let active = covered ? (x * 13 + y * 7 + x * y) % 11 < 6 : rows[y][x] === '1';
+        if (active && (x * 17 + y * 29 + x * y * 3) % 10 === 0) active = false;
+        circle.style.display = active ? '' : 'none';
         const cell = { circle, active, x, y };
+        circle.style.transition = 'none';
         cells.push(cell);
         grid.set(`${x},${y}`, cell);
         svg.appendChild(circle);
@@ -109,6 +130,7 @@
     }
     function updateConnections() {
       const lines = document.createDocumentFragment();
+      if (state.basePattern === 'large') { connections.replaceChildren(); return; }
       for (const cell of cells) {
         if (!cell.active) continue;
         for (const [dx, dy] of [[1, 0], [0, 1]]) {
@@ -140,11 +162,23 @@
         const newDot = off.splice(Math.floor(Math.random() * off.length), 1)[0];
         oldDot.active = false;
         newDot.active = true;
-        oldDot.circle.style.visibility = 'hidden';
-        newDot.circle.style.visibility = 'visible';
+        oldDot.circle.style.display = 'none';
+        newDot.circle.style.display = '';
       }
       updateConnections();
     }, 1000);
+  }
+  function buildRequestQrPattern() {
+    const el = document.querySelector('.qr-placeholder');
+    if (!el) return;
+    const source = document.querySelector('#qrImage > svg');
+    if (!source) return;
+    const pattern = source.cloneNode(true);
+    pattern.removeAttribute('id');
+    pattern.setAttribute('aria-hidden', 'true');
+    pattern.style.cssText = 'position:absolute; inset:0; width:100%; height:100%;';
+    el.style.background = 'none';
+    el.replaceChildren(pattern, el.querySelector('.request-plus'));
   }
   const moreBtn = document.getElementById('moreBtn');
   const actionsMenu = document.getElementById('actionsMenu');
@@ -164,17 +198,6 @@
   });
 
   // Safari browser chrome is controlled by Safari; standalone launch omits it.
-  const browserHelp = document.getElementById('browserHelp');
-  const browserHelpText = document.getElementById('browserHelpText');
-  const installInstructions = browserHelpText.textContent;
-  els.hideBtn.addEventListener('click', () => {
-    closeMenu();
-    const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-    browserHelpText.textContent = standalone
-      ? 'You’re already viewing this invite without Safari’s toolbar.'
-      : installInstructions;
-    browserHelp.showModal();
-  });
   els.closeBtn.addEventListener('click', () => {
     // No real navigation target in this standalone demo; just a visual affordance.
   });
@@ -194,6 +217,21 @@
   }
 
   els.settingsBtn.addEventListener('click', openSheet);
+  function openPattern() {
+    closeMenu();
+    els.cornerPattern.value = state.cornerPattern;
+    els.basePattern.value = state.basePattern;
+    els.patternDialog.showModal();
+    els.patternDialog.focus();
+  }
+  els.patternBtn.addEventListener('click', openPattern);
+  function refreshPattern() {
+    buildQrPattern();
+    buildRequestQrPattern();
+    saveState();
+  }
+  els.cornerPattern.addEventListener('change', () => { state.cornerPattern = els.cornerPattern.value; refreshPattern(); });
+  els.basePattern.addEventListener('change', () => { state.basePattern = els.basePattern.value; refreshPattern(); });
   els.closeSheetBtn.addEventListener('click', closeSheet);
   els.sheetOverlay.addEventListener('click', (e) => {
     if (e.target === els.sheetOverlay) closeSheet();
@@ -343,5 +381,6 @@
   loadState();
   applyState();
   buildQrPattern();
+  buildRequestQrPattern();
   goToSlide(currentSlide, false);
 })();

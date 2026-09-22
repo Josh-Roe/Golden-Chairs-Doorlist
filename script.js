@@ -36,8 +36,8 @@
   const DEFAULT_EVENT_PHOTO = 'assets/event.png';
 
   let state = {
-    eventName: 'Phi Kap Miami',
-    personName: 'Sara Hwang',
+    eventName: 'Fairs bro fairs',
+    personName: 'Josh is da real goat',
     eventPhoto: DEFAULT_EVENT_PHOTO,
     profilePhoto: DEFAULT_AVATAR,
   };

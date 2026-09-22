@@ -119,7 +119,7 @@
         circle.setAttribute('fill', '#000');
         const covered = Math.hypot(38 + x * 17.4 - 356, 37 + y * 17.5 - 352) < 83;
         let active = covered ? (x * 13 + y * 7 + x * y) % 11 < 6 : rows[y][x] === '1';
-        if (active && (x * 17 + y * 29 + x * y * 3) % 10 === 0) active = false;
+        if (active && (x * 17 + y * 29 + x * y * 3) % 20 < 3) active = false;
         circle.style.display = active ? '' : 'none';
         const cell = { circle, active, x, y };
         circle.style.transition = 'none';

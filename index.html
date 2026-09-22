@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#000000" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+<link rel="icon" type="image/png" href="assets/icon-192.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<title>Phi Kap Miami — Invite</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="phone">
+
+    <!-- App bar: close, event pill, hide + settings buttons. Hidden entirely in "hide" mode. -->
+    <div class="app-bar" id="appBar">
+      <button class="icon-btn" id="closeBtn" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>
+      </button>
+
+      <div class="event-pill">
+        <span class="event-photo-frame"><img id="eventPhoto" class="event-photo" src="" alt="Event" /></span>
+        <span id="eventName" class="event-name">Phi Kap Miami</span>
+      </div>
+
+      <button class="icon-btn more-btn" id="moreBtn" aria-label="More options" aria-expanded="false"><svg viewBox="0 0 50 50"><circle cx="17" cy="25" r="2.4" fill="currentColor"/><circle cx="25" cy="25" r="2.4" fill="currentColor"/><circle cx="33" cy="25" r="2.4" fill="currentColor"/></svg></button>
+      <div class="app-bar-actions" id="actionsMenu" hidden>
+        <button class="text-btn" id="hideBtn">Hide</button>
+        <button class="text-btn" id="settingsBtn">Settings</button>
+      </div>
+    </div>
+
+
+
+    <!-- Main invite card -->
+    <div class="content">
+      <div class="carousel-viewport" id="carouselViewport">
+        <div class="carousel-track" id="carouselTrack">
+
+          <div class="slide">
+            <div class="invite-card">
+              <div class="invite-header">
+                <div>
+                  <div id="personName" class="person-name">Sara Hwang</div>
+                  <div class="invite-sub">Your invite</div>
+                </div>
+                <button class="refresh-btn" aria-label="Refresh">
+                  <svg viewBox="0 0 32 36" width="32" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 17v-6a4 4 0 0 1 4-4h20M23 2l5 5-5 5"/>
+                    <path d="M28 19v6a4 4 0 0 1-4 4H4m5-5-5 5 5 5"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="qr-wrap">
+                <div class="qr-image" id="qrImage" aria-label="QR code"></div>
+                <img id="profilePhoto" class="qr-avatar" src="" alt="Profile" />
+              </div>
+            </div>
+          </div>
+
+          <div class="slide">
+            <div class="invite-card additional-invite">
+              <svg class="placeholder-outline" viewBox="0 0 355 412" preserveAspectRatio="none" aria-hidden="true"><rect x="1" y="1" width="353" height="410" rx="24"/></svg>
+              <div class="invite-header"><div><div class="person-name">More invites</div><div class="invite-sub">Your invites</div></div></div>
+              <div class="qr-wrap qr-placeholder" role="img" aria-label="Gray invite placeholder"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="dots" id="dots">
+        <button class="dot" data-index="0" aria-label="Show your invite"></button>
+        <button class="dot add-dot" data-index="1" aria-label="Show more invites"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 3v6M3 6h6"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings bottom sheet -->
+  <div class="sheet-overlay" id="sheetOverlay">
+    <div class="sheet" id="sheet">
+      <div class="sheet-handle"></div>
+      <h2 class="sheet-title">Settings</h2>
+
+      <div class="settings-row">
+        <div class="settings-preview">
+          <img id="profilePreview" class="preview-avatar" src="" alt="Profile preview" />
+        </div>
+        <div class="settings-field">
+          <label>Profile photo</label>
+          <p class="settings-hint">Shown in the middle of your QR code</p>
+          <label class="upload-btn">
+            Upload photo
+            <input type="file" accept="image/*" id="profileUpload" hidden />
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-preview">
+          <img id="eventPreview" class="preview-avatar preview-square" src="" alt="Event preview" />
+        </div>
+        <div class="settings-field">
+          <label>Event photo</label>
+          <p class="settings-hint">Shown next to the event name</p>
+          <label class="upload-btn">
+            Upload photo
+            <input type="file" accept="image/*" id="eventUpload" hidden />
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-field full">
+        <label for="eventNameInput">Event name</label>
+        <input type="text" id="eventNameInput" placeholder="Phi Kap Miami" />
+      </div>
+
+      <div class="settings-field full">
+        <label for="personNameInput">Your name</label>
+        <input type="text" id="personNameInput" placeholder="Sara Hwang" />
+      </div>
+
+      <div class="sheet-buttons">
+        <button class="sheet-btn secondary" id="closeSheetBtn">Cancel</button>
+        <button class="sheet-btn primary" id="saveSheetBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="browserHelp" class="browser-help" aria-labelledby="browserHelpTitle">
+    <h2 id="browserHelpTitle">Hide Safari’s toolbar</h2>
+    <p id="browserHelpText">Safari controls its search bar. To view your invite without it, tap Safari’s Share button, choose Add to Home Screen, then open the new icon. If shown, leave Open as Web App enabled.</p>
+    <p>Your event name and top buttons stay visible.</p>
+    <form method="dialog"><button class="sheet-btn primary">Got it</button></form>
+  </dialog>
+  <script src="script.js"></script>
+</body>
+</html>

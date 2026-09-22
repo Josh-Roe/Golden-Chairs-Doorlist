@@ -32,8 +32,8 @@
     dots: Array.from(document.querySelectorAll('.dot')),
   };
 
-  const DEFAULT_AVATAR = 'assets/profile.png';
-  const DEFAULT_EVENT_PHOTO = 'assets/event.png';
+  const DEFAULT_AVATAR = 'profile.png';
+  const DEFAULT_EVENT_PHOTO = 'event.png';
 
   let state = {
     eventName: 'Fairs bro fairs',
@@ -81,7 +81,7 @@
     svg.setAttribute('viewBox', '0 0 702 704');
     svg.setAttribute('width', '100%');
     svg.setAttribute('height', '100%');
-    svg.innerHTML = `<defs><clipPath id="fixed-finders"><rect x="28" y="26" width="130" height="127"/><rect x="552" y="26" width="123" height="127"/><rect x="28" y="551" width="130" height="128"/></clipPath></defs><rect width="702" height="704" fill="#fff"/><image href="assets/qr.svg" width="702" height="704" clip-path="url(#fixed-finders)"/>`;
+    svg.innerHTML = `<defs><clipPath id="fixed-finders"><rect x="28" y="26" width="130" height="127"/><rect x="552" y="26" width="123" height="127"/><rect x="28" y="551" width="130" height="128"/></clipPath></defs><rect width="702" height="704" fill="#fff"/><image href="qr.svg" width="702" height="704" clip-path="url(#fixed-finders)"/>`;
     const connections = document.createElementNS(ns, 'g');
     connections.setAttribute('stroke', '#000');
     connections.setAttribute('stroke-width', '2.5');
